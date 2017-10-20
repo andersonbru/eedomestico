@@ -1,0 +1,13 @@
+.voltar {
+	-webkit-transform:rotate(180deg); 
+	-moz-transform:rotate(180deg);
+}
+.inputErro {
+	border: 1px solid red;
+}
+.email {
+	text-transform: lowercase; 
+}
+.ui-datepicker{ 
+	z-index:1151 !important; 
+}
