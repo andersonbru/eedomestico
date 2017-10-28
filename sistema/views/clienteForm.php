@@ -183,6 +183,9 @@ $template = new Template();
 								<h6 class="panel-title">Arquivos</h6>
 								<div class="heading-elements">
 									<ul class="icons-list">
+										<li>
+											<a href="#" rel="nv-arquivos" title="Novo arquivo"><i class="icon-plus3"></i></a>
+										</li>
 				                		<li><a data-action="collapse"></a></li>
 				                		<!-- <li><a data-action="reload"></a></li>
 				                		<li><a data-action="close"></a></li> -->
@@ -191,12 +194,14 @@ $template = new Template();
 		                	</div>
 
 							<div class="panel-body">
-								<table class="table table-paginacao table-responsive table-arquivos">
+								<table class="table table-responsive table-arquivos">
 									<thead>
 										<tr>
 											<th>Código</th>
 											<th>Cadastro</th>
 											<th>Descrição</th>
+											<th>Tipo</th>
+											<th>Tamanho</th>
 											<th class="text-center">Ações</th>
 										</tr>
 									</thead>
@@ -293,12 +298,56 @@ $template = new Template();
 		</div>
 	</div>
 </div>	
+
+<div class="modal fade" id="modal-arquivos" tabindex="-1" role="dialog" aria-labelledby="modalArquivosLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="modalExcluirLabel">Controle de Arquivos</h4>
+			</div>
+			<div class="modal-body">
+			<?php
+			$template->iniciarForm('#','post','','name=form-arquivos');
+				$template->gerarInputHidden('id_clientes', $data['id']);
+				$template->gerarInputHidden('id', '');
+				$template->gerarInputText('Descrição', 'descricao', '', 'Descrição', TRUE, '', '', 2, 2, 10, 10);
+				$template->gerarInputText('Período', 'periodo', '', '99/9999', TRUE, 'mask-periodo', '', 2, 2, 2, 2);
+				$template->gerarInputText('Arquivo', 'arquivo', '', 'Arquivos', TRUE, '', '', 2, 2, 10, 10, 'file');				
+				$template->gerarTextArea('Observação', 'observacao', '', '');
+				
+			$template->finalizarForm();
+			?>
+			</div>
+			<div class="modal-footer">
+				<button type="button" rel="cancel_exclusao" class="btn btn-default" data-dismiss="modal">
+					Cancelar
+				</button>
+				<button type="button" rel="add-arquivos" class="btn btn-primary">
+					Salvar
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
 	
 <script>
 
 function tabela_funcionarios(cliente){
 	$('#table-funcionarios').dataTable({		
 		ajax: '<?=site_url()?>/funcionarios-lista/'+cliente,
+		"language": {
+						"url": "https://cdn.datatables.net/plug-ins/1.10.13/i18n/Portuguese-Brasil.json"
+				},
+		"destroy": true,
+		"processing": true
+    });    
+}
+function tabela_arquivos(cliente){
+	$('.table-arquivos').dataTable({		
+		ajax: '<?=site_url()?>/arquivos-lista/'+cliente,
 		"language": {
 						"url": "https://cdn.datatables.net/plug-ins/1.10.13/i18n/Portuguese-Brasil.json"
 				},
@@ -314,7 +363,7 @@ function carregaTabela(){
 
 function limpaForm(form){
 	$('.msg-'+form+'').remove();
-	$('form[name='+form+']').find('input, select').each(function(){
+	$('form[name='+form+']').find('input, select, textarea').each(function(){
 		$(this).val('');
 	});
 }
@@ -370,6 +419,7 @@ $(document).ready(function(){
 	
 	if('<?=$data['id']?>'!='' && '<?=$acao?>'=='edit'){
 		tabela_funcionarios('<?=$data['id']?>');
+		tabela_arquivos('<?=$data['id']?>');
 	}
 	
 	$('a[rel=nv-funcionario]').on('click',function(e){
@@ -418,6 +468,24 @@ $(document).ready(function(){
 	$('button[rel=add-funcionarios]').on('click', function(e){
 		e.preventDefault();
 		submitForm('funcionarios');
+	});
+	
+	//Ações arquivos
+	$('a[rel=nv-arquivos]').on('click',function(e){
+		e.preventDefault();
+		limpaForm('form-arquivos');
+		$('form[name=form-arquivos] input[name=id_clientes]').val(<?=$data['id']?>);
+		$('#modal-arquivos').modal('show');
+		$('form[name=form-arquivos]').attr('action','<?=site_url()?>/arquivos-add');
+	});
+	
+	$('#modal-arquivos').on('hidden.bs.modal', function (e) {
+		limpaForm('form-arquivos');
+	})
+	
+	$('button[rel=add-arquivos]').on('click', function(e){
+		e.preventDefault();
+		submitForm('arquivos');
 	});
 	
 });

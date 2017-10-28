@@ -49,6 +49,7 @@ include_once('./controls/acesso.php');
 include_once('./controls/menu.php');
 include_once('./controls/clientes.php');
 include_once('./controls/funcionarios.php');
+include_once('./controls/arquivos.php');
 
 $app->run();
 

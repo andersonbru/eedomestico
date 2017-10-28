@@ -117,17 +117,20 @@ class Connection extends PDO {
 	    }
 	}
 	
-	public function insertBlob($nome, $tipo, $tamanho, $descricao, $arquivo, $periodo, $id_clientes, $observacao, $chave, $enviado) {
+	public function insertBlob($nome, $tipo, $tamanho, $extensao, $descricao, $arquivo, $periodo, $id_clientes, $observacao, $chave, $enviado) {
 		$conn = $this->conn;
         $blob = file_get_contents($arquivo);
+		//$blob = mysql_real_escape_string($blob);
+		//$blob = fopen($arquivo, 'rb');
 		
-		$sql = "INSERT INTO tb_arquivos(nome,tipo,tamanho,descricao,arquivo,periodo,id_clientes,observacao,chave, enviado) 
-								 VALUES(:NOME,:TTIPO,:TAMANHO,:DESCRICAO,:ARQUIVO,:PERIODO,:ID_CLIENTES,:OBSERVACAO,:CHAVE, :ENVIADO)";
+		$sql = "INSERT INTO tb_arquivos(nome,tipo,tamanho,extensao,descricao,arquivo,periodo,id_clientes,observacao,chave, enviado) 
+								 VALUES(:NOME,:TIPO,:TAMANHO,:EXTENSAO,:DESCRICAO,:ARQUIVO,:PERIODO,:ID_CLIENTES,:OBSERVACAO,:CHAVE,:ENVIADO)";
         $stmt = $conn->prepare($sql);
  
         $stmt->bindParam(':NOME', $nome);
 		$stmt->bindParam(':TIPO', $tipo);
 		$stmt->bindParam(':TAMANHO', $tamanho);
+		$stmt->bindParam(':EXTENSAO', $extensao);
 		$stmt->bindParam(':DESCRICAO', $descricao);
 		$stmt->bindParam(':ARQUIVO', $blob, PDO::PARAM_LOB);
 		$stmt->bindParam(':PERIODO', $periodo);
@@ -139,6 +142,7 @@ class Connection extends PDO {
 		try {			 
 	        $conn->beginTransaction(); 
 	        $stmt->execute(); 
+			//$registro = $conn->lastInsertId();
 	        $conn->commit();
 			return TRUE;
 			 
@@ -149,7 +153,7 @@ class Connection extends PDO {
 	    }		
     }
 	
-	public function updateBlob($id, $nome, $tipo, $tamanho, $descricao, $arquivo, $periodo, $id_clientes, $observacao, $chave, $enviado) {
+	public function updateBlob($id, $nome, $tipo, $tamanho, $extensao, $descricao, $arquivo, $periodo, $id_clientes, $observacao, $chave, $enviado) {
  		$conn = $this->conn;
         $blob = file_get_contents($arquivo);
 		
@@ -157,6 +161,7 @@ class Connection extends PDO {
                 SET nome 		= :NOME,
                 	tipo 		= :TIPO,
                 	tamanho		= :TAMANHO,
+                	extensao	= :EXTENSAO,
                 	descricao	= :DESCRICAO,
                 	arquivo		= :ARQUIVO,
                 	periodo		= :PERIODO,
@@ -173,6 +178,7 @@ class Connection extends PDO {
         $stmt->bindParam(':NOME', $nome);
 		$stmt->bindParam(':TIPO', $tipo);
 		$stmt->bindParam(':TAMANHO', $tamanho);
+		$stmt->bindParam(':EXTENSAO', $extensao);
 		$stmt->bindParam(':DESCRICAO', $descricao);
 		$stmt->bindParam(':ARQUIVO', $blob, PDO::PARAM_LOB);
 		$stmt->bindParam(':PERIODO', $periodo);
@@ -193,26 +199,43 @@ class Connection extends PDO {
 	    }
     }
 	
-	public function selectBlob($id_clientes, $chave) {
+	public function selectBlob($id_clientes='', $chave='') {
  		$conn = $this->conn;
-        $sql = "SELECT id, nome, tipo, tamanho. descricao, arquivo, dt_cadastro, periodo, id_clientes, observacao, chave, enviado
-                  FROM tb_arquivos
-                 WHERE id_clientes = :ID_CLIENTES AND chave=:CHAVE;";
- 
-        $stmt = $conn->prepare($sql);
-        $stmt->execute(array(":ID_CLIENTES"=>$id_clientes, ':CHAVE'=>$chave));
+ 		
+ 		if (!empty($id_clientes) && !empty($chave)) {
+			$sql = "SELECT id, nome, tipo, tamanho, extensao, descricao, arquivo, dt_cadastro, periodo, id_clientes, observacao, chave, enviado
+	                  FROM tb_arquivos
+	                 WHERE id_clientes = :ID_CLIENTES AND chave=:CHAVE;";
+			$stmt = $conn->prepare($sql);
+        	$stmt->execute(array(":ID_CLIENTES"=>$id_clientes, ':CHAVE'=>$chave));
+				 
+		} else if (!empty($id_clientes) && empty($chave)) {
+			$sql = "SELECT id, nome, tipo, tamanho, extensao, descricao, arquivo, dt_cadastro, periodo, id_clientes, observacao, chave, enviado
+	                  FROM tb_arquivos
+	                 WHERE id_clientes = :ID_CLIENTES";	 
+			$stmt = $conn->prepare($sql);
+        	$stmt->execute(array(":ID_CLIENTES"=>$id_clientes));
+		} else if (empty($id_clientes) && !empty($chave)) {
+			$sql = "SELECT id, nome, tipo, tamanho, extensao, descricao, arquivo, dt_cadastro, periodo, id_clientes, observacao, chave, enviado
+	                  FROM tb_arquivos
+	                 WHERE chave = :CHAVE";	 
+			$stmt = $conn->prepare($sql);
+        	$stmt->execute(array(':CHAVE'=>$chave));
+		}
+        
         $stmt->bindColumn(1, $id);
         $stmt->bindColumn(2, $nome);
         $stmt->bindColumn(3, $tipo);
         $stmt->bindColumn(4, $tamanho);
-		$stmt->bindColumn(5, $descricao);
-        $stmt->bindColumn(6, $arquivo, PDO::PARAM_LOB);
-		$stmt->bindColumn(7, $dt_cadastro);
-		$stmt->bindColumn(8, $periodo);
-		$stmt->bindColumn(9, $id_clientes);
-		$stmt->bindColumn(10, $observacao);
-		$stmt->bindColumn(11, $chave);
-		$stmt->bindColumn(12, $enviado);
+		$stmt->bindColumn(5, $extensao);
+		$stmt->bindColumn(6, $descricao);
+        $stmt->bindColumn(7, $arquivo, PDO::PARAM_LOB);
+		$stmt->bindColumn(8, $dt_cadastro);
+		$stmt->bindColumn(9, $periodo);
+		$stmt->bindColumn(10, $id_clientes);
+		$stmt->bindColumn(11, $observacao);
+		$stmt->bindColumn(12, $chave);
+		$stmt->bindColumn(13, $enviado);
  
         $stmt->fetch(PDO::FETCH_BOUND);
  
@@ -220,6 +243,7 @@ class Connection extends PDO {
         		     'nome'=>$nome, 
         		     'tipo'=>$tipo, 
         		     'tamanho'=>$tamanho, 
+        		     'extensao'=>$extensao,
         		     'descricao'=>$descricao,
         		     'arquivo'=>$arquivo, 
         		     'dt_cadastro'=>$dt_cadastro,
@@ -232,7 +256,7 @@ class Connection extends PDO {
 	
 	public function selectBlobMd5($id) {
  		$conn = $this->conn;
-        $sql = "SELECT id, nome, tipo, tamanho. descricao, arquivo, dt_cadastro, periodo, id_clientes, observacao, chave, enviado
+        $sql = "SELECT id, nome, tipo, tamanho, extensao, descricao, arquivo, dt_cadastro, periodo, id_clientes, observacao, chave, enviado
                   FROM tb_arquivos
                  WHERE md5(id) = :ID;";
  
@@ -242,14 +266,15 @@ class Connection extends PDO {
         $stmt->bindColumn(2, $nome);
         $stmt->bindColumn(3, $tipo);
         $stmt->bindColumn(4, $tamanho);
-		$stmt->bindColumn(5, $descricao);
-        $stmt->bindColumn(6, $arquivo, PDO::PARAM_LOB);
-		$stmt->bindColumn(7, $dt_cadastro);
-		$stmt->bindColumn(8, $periodo);
-		$stmt->bindColumn(9, $id_clientes);
-		$stmt->bindColumn(10, $observacao);
-		$stmt->bindColumn(11, $chave);
-		$stmt->bindColumn(12, $enviado);
+		$stmt->bindColumn(5, $extensao);
+		$stmt->bindColumn(6, $descricao);
+        $stmt->bindColumn(7, $arquivo, PDO::PARAM_LOB);
+		$stmt->bindColumn(8, $dt_cadastro);
+		$stmt->bindColumn(9, $periodo);
+		$stmt->bindColumn(10, $id_clientes);
+		$stmt->bindColumn(11, $observacao);
+		$stmt->bindColumn(12, $chave);
+		$stmt->bindColumn(13, $enviado);
  
         $stmt->fetch(PDO::FETCH_BOUND);
  
@@ -257,6 +282,7 @@ class Connection extends PDO {
         		     'nome'=>$nome, 
         		     'tipo'=>$tipo, 
         		     'tamanho'=>$tamanho, 
+        		     'extensao'=>$extensao,
         		     'descricao'=>$descricao,
         		     'arquivo'=>$arquivo, 
         		     'dt_cadastro'=>$dt_cadastro,
@@ -266,7 +292,6 @@ class Connection extends PDO {
         		     'chave'=>$chave,
         		     'enviado'=>$enviado);
     }
-	
 	
 }
 ?>

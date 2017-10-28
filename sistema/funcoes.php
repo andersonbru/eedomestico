@@ -219,7 +219,7 @@ function formato_moeda($valor){
 }
 
 function extensoes_permitidos(){
-	return array('pdf','jpg','png');
+	return array('pdf','jpg','jpeg','png','doc','docx','txt','xls','xlsx','csv','zip','rar');
 }
 
 function By2M($size){

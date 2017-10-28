@@ -5,6 +5,7 @@ Class Arquivos extends Connection{
 	private $nome;
 	private $tipo;
 	private $tamanho;
+	private $extensao;
 	private $descricao;
 	private $arquivo;
 	private $dt_cadastro;
@@ -40,6 +41,13 @@ Class Arquivos extends Connection{
 	}
 	public function setTamanho($value){
 		$this->tamanho = $value;
+	}
+	
+	public function getExtensao(){
+		return $this->extensao;
+	}
+	public function setExtensao($value){
+		$this->extensao = $value;
 	}
 	
 	public function getDescricao(){
@@ -104,6 +112,7 @@ Class Arquivos extends Connection{
 		if(isset($values['nome'])) 						$this->setNome($values['nome']);
 		if(isset($values['tipo'])) 						$this->setTipo($values['tipo']);
 		if(isset($values['tamanho']))					$this->setTamanho($values['tamanho']);
+		if(isset($values['extensao']))					$this->setExtensao($values['extensao']);
 		if(isset($values['descricao']))					$this->setDescricao($values['descricao']);
 		if(isset($values['arquivo'])) 					$this->setArquivo($values['arquivo']);
 		if(isset($values['dt_cadastro']))				$this->setDtCadastro($values['dt_cadastro']);
@@ -121,6 +130,7 @@ Class Arquivos extends Connection{
 		if(!empty($this->getNome()))					$values['nome']			 			= $this->getNome();
 		if(!empty($this->getTipo())) 					$values['tipo']			 			= $this->getTipo();
 		if(!empty($this->getTamanho()))					$values['tamanho']		 			= $this->getTamanho();
+		if(!empty($this->getExtensao()))				$values['extensao']		 			= $this->getExtensao();
 		if(!empty($this->getDescricao()))				$values['descricao']	 			= $this->getDescricao();
 		if(!empty($this->getArquivo()))					$values['arquivo'] 		 			= $this->getArquivo();
 		if(!empty($this->getDtCadastro()))				$values['dt_cadastro']	 			= $this->getDtCadastro();
@@ -134,19 +144,19 @@ Class Arquivos extends Connection{
 		
 	}
 	
-	public function insertBlob($nome, $tipo, $tamanho, $descricao, $arquivo, $periodo, $id_clientes, $observacao, $chave, $enviado) {
+	public function insertBlob($nome, $tipo, $tamanho, $extensao, $descricao, $arquivo, $periodo, $id_clientes, $observacao, $chave, $enviado) {
 		$conn = new Connection();
-		$arq = $conn->insertBlob($nome, $tipo, $tamanho, $descricao, $arquivo, $periodo, $id_clientes, $observacao, $chave, $enviado);
+		$arq = $conn->insertBlob($nome, $tipo, $tamanho, $extensao, $descricao, $arquivo, $periodo, $id_clientes, $observacao, $chave, $enviado);
         return $arq;
     }
 	
-	public function updateBlob($id, $nome, $tipo, $tamanho, $descricao, $arquivo, $periodo, $id_clientes, $observacao, $chave, $enviado) {
+	public function updateBlob($id, $nome, $tipo, $tamanho, $extensao, $descricao, $arquivo, $periodo, $id_clientes, $observacao, $chave, $enviado) {
 		$conn = new Connection();
-		$arq = $conn->updateBlob($id, $nome, $tipo, $tamanho, $descricao, $arquivo, $periodo, $id_clientes, $observacao, $chave, $enviado);
+		$arq = $conn->updateBlob($id, $nome, $tipo, $tamanho, $extensao, $descricao, $arquivo, $periodo, $id_clientes, $observacao, $chave, $enviado);
         return $arq;
     }
 	
-	public function selectBlob($id_clientes, $chave) {
+	public function selectBlob($id_clientes='', $chave='') {
 		$conn = new Connection();
 		$arq = $conn->selectBlob($id_clientes, $chave);
         return $arq;
@@ -161,14 +171,14 @@ Class Arquivos extends Connection{
 	public function loadArquivos($id_clientes){
 		$retorno = '';	
 		$conn = new Connection();
-		
 		$result = $conn->select("SELECT a.id,
 									    a.nome,
 								        a.tipo,
 								        a.tamanho,
+								        a.extensao,
 								        a.descricao,								        
 								        date_format(a.dt_cadastro,'%d/%m/%Y') as dt_cadastro,
-								        if(a.arquivo is not null, 1, 0) as fg_arquivo
+								        if(a.arquivo is not null, 1, 0) as fg_arquivo,
 								        a.periodo,
 								        a.observacao,
 								        a.chave,

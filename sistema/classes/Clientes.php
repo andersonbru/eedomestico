@@ -270,61 +270,6 @@ Class Clientes extends Connection{
 	*/
 	
 	//Classe de arquivos
-	
-	public function insertBlob($nome, $type, $size, $arquivo, $chave, $id_usuario) {
-		$conn = new Connection();
-		$arq = $conn->insertBlob($nome, $type, $size, $arquivo, $chave, $id_usuario);
-        return $arq;
-    }
-	
-	public function updateBlob($id, $nome, $type, $size, $arquivo, $chave, $id_usuario) {
-		$conn = new Connection();
-		$arq = $conn->updateBlob($id, $nome, $type, $size, $arquivo, $chave, $id_usuario);
-        return $arq;
-    }
-	
-	public function selectBlob($id_usuario, $chave) {
-		$conn = new Connection();
-		$arq = $conn->selectBlob($id_usuario, $chave);
-        return $arq;
-    }
-	
-	public function selectBlobMd5($id) {
-		$conn = new Connection();
-		$arq = $conn->selectBlobMd5($id);
-        return $arq;
-    }
-	
-	public function loadArquivos($usuario){
-		$retorno = '';	
-		$conn = new Connection();
-		
-		$result = $conn->select("SELECT a.id,
-									    a.nome,
-								        a.type,
-								        a.size,
-								        date_format(a.dt_cadastro,'%d/%m/%Y') as dt_cadastro,
-								        if(a.arquivo is not null, 1, 0) as fg_arquivo
-								   FROM tb_arquivos a 
-								  WHERE a.id_usuarios = :USUARIO;",array(
-			":USUARIO" => $usuario
-		));
-		
-		if (isset($result[0])) {
-			$retorno = $result;
-		}else {
-			$retorno = FALSE;
-		}
-		
-		return $retorno;
-	}
-	
-	public function del_arquivo($values=array()){
-		$conn = new Connection();		
-		$delete = $conn->delete('tb_arquivos', $values);
-		return $delete;
-	}
-	
 	public function validaEmail($email){
 		$retorno = '';	
 		$conn = new Connection();
