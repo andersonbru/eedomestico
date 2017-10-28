@@ -18,6 +18,10 @@ $app->get('/', function() use ($app){
 	$app->render('login.php');
 });
 
+$app->get('/sistema', function() use ($app){
+	$app->render('login.php');
+});
+
 $app->get('/principal', function() use ($app){
 	valida_logado();	
 	$app->render('principal.php');
@@ -43,7 +47,8 @@ $app->notFound(function () use ($app) {
 
 include_once('./controls/acesso.php');
 include_once('./controls/menu.php');
-
+include_once('./controls/clientes.php');
+include_once('./controls/funcionarios.php');
 
 $app->run();
 

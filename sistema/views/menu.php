@@ -7,8 +7,8 @@
 				<div class="media">
 					<a href="#" class="media-left">
 					<?php
-					$arquivo = new Arquivos();
-					$logo = $arquivo->selectBlob($_SESSION['usuario']['id'], 'LOGO-ADMIN');
+					//$arquivo = new Arquivos();
+					//$logo = $arquivo->selectBlob($_SESSION['usuario']['id'], 'LOGO-ADMIN');
 					if (isset($logo) && $logo['size']>0) {
 						echo '<img src="/arquivo/'.$_SESSION['usuario']['id'].'/LOGO-ADMIN" class="img-circle img-sm">';
 					} else {
@@ -47,9 +47,33 @@
 
 					<!-- Main -->
 					<li class="navigation-header"><span>Main</span> <i class="icon-menu" title="Main pages"></i></li>
-					<li class="active"><a href="principal"><i class="icon-home4"></i> <span>Principal</span></a></li>
+					<li class=""><a href="principal"><i class="icon-home4"></i> <span>Principal</span></a></li>
 					
 					<?php
+					if ($_SESSION['usuario']['perfil']=='A') {
+						
+						echo '<li class=""><a href="clientes"><i class="icon-user"></i> <span>Controle de Clientes</span></a></li>';
+						
+						echo '<li>';
+							echo '<a href="#"><i class="icon-files-empty"></i> <span>Controle de Arquivos</span></a>';
+							echo '<ul>';
+								echo '<li><a href="#"><i class="icon-file-upload2"></i> <span>Enviados</span></a></li>';
+								echo '<li><a href="#"><i class="icon-file-download2"></i> <span>Recebidos</span></a></li>';
+							echo '</ul>';
+						echo '</li>';
+						
+						echo '<li>';
+							echo '<a href="#"><i class="icon-cogs"></i> <span>Configurações</span></a>';
+							echo '<ul>';
+								echo '<li><a href="#"><i class="icon-wrench3"></i> <span>Categorias de arquivos</span></a></li>';
+								echo '<li><a href="#"><i class="icon-home"></i> <span>Empresa</span></a></li>';
+							echo '</ul>';
+						echo '</li>';
+						
+					}else{
+						
+					}
+					
 					/*
 					$menu = new Menu();
 					$listaMenu = $menu->gerarMenu($_SESSION['usuario']['id'], $_SESSION['usuario']['perfil']);

@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
 	<?php
+	
 	$emp = new Empresa();
 	if(isset($_SESSION['usuario']['id'])){
 		$fg_empresa = $emp->loadId($_SESSION['usuario']['id']);
@@ -13,7 +14,7 @@
 	}else{
 		$empresa =  $emp->carregaEmpresa();
 	}		
-	
+	/*
 	if(isset($_SESSION['usuario']['id'])){
 		$arquivo = new Arquivos();
 		$favicon = $arquivo->selectBlob($_SESSION['usuario']['id'], 'FAVICON-ADMIN');
@@ -25,7 +26,7 @@
 	}else{
 		$ico = '';
 	}
-		
+	*/	
 	?>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">

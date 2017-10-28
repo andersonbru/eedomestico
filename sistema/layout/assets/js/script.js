@@ -110,10 +110,13 @@ $(document).ready(function(){
 	
 	$('[data-toggle="tooltip"]').tooltip();
 	$('[data-toggle="popover"]').popover();
+	
 	$('.table-paginacao').DataTable({
 		"language": {
 						"url": "https://cdn.datatables.net/plug-ins/1.10.13/i18n/Portuguese-Brasil.json"
-					}
+				},
+		"destroy": true,
+		"processing": true
 	});
 	
 	//$('.editor-html').summernote();

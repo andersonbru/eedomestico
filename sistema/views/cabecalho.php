@@ -1,8 +1,8 @@
 <div class="navbar navbar-inverse">
 	<div class="navbar-header">
 		<?php
-		$arquivo = new Arquivos();
-		$logo = $arquivo->selectBlob($_SESSION['usuario']['id'], 'LOGO-ADMIN');
+		//$arquivo = new Arquivos();
+		//$logo = $arquivo->selectBlob($_SESSION['usuario']['id'], 'LOGO-ADMIN');
 		if (isset($logo) && $logo['size']>0 && 1==2) {
 			$img = '<img src="/arquivo/'.$_SESSION['usuario']['id'].'/LOGO-ADMIN" style="width: 70px; height: 30px;">';
 		} else {
@@ -162,7 +162,7 @@
 					<li class="divider"></li>
 					<li><a href="#"><i class="icon-cog5"></i> Account settings</a></li>
 					-->
-					<li><a href="/logout"><i class="icon-switch2"></i> Sair</a></li>
+					<li><a href="<?=site_url()?>/logout"><i class="icon-switch2"></i> Sair</a></li>
 				</ul>
 			</li>
 		</ul>

@@ -80,7 +80,7 @@ require_once("cabecalho.php");
 						<!-- principal -->
 						<div class="panel panel-flat">
 							<div class="panel-heading">
-								<h6 class="panel-title">titulo</h6>
+								<!-- <h6 class="panel-title">titulo</h6> -->
 								<div class="heading-elements">
 									<!-- <span class="label bg-success heading-text">28 active</span> -->
 									<!--
@@ -100,112 +100,87 @@ require_once("cabecalho.php");
 			                	</div>
 							</div>
 							
+							<div class="panel-body">
+								
+								<?php
+								if($_SESSION['usuario']['perfil']=='A'){
+								
+								?>
+								<div class="row">
+									<div class="col-sm-6 col-md-3">
+										<div class="panel panel-body bg-success-400 has-bg-image">
+											<div class="media no-margin">
+												<div class="media-body">
+													<h3 class="no-margin"><?=$cli_qtd['ativo']?></h3>
+													<span class="text-uppercase text-size-mini">Clientes Ativos</span>
+												</div>
+			
+												<div class="media-right media-middle">
+													<i class="icon-user icon-3x opacity-75"></i>
+												</div>
+											</div>
+										</div>
+									</div>
+			
+									<div class="col-sm-6 col-md-3">
+										<div class="panel panel-body bg-danger-400 has-bg-image">
+											<div class="media no-margin">
+												<div class="media-body">
+													<h3 class="no-margin"><?=$cli_qtd['inativo']?></h3>
+													<span class="text-uppercase text-size-mini">Clientes Inativos</span>
+												</div>
+			
+												<div class="media-right media-middle">
+													<i class="icon-user icon-3x opacity-75"></i>
+												</div>
+											</div>
+										</div>
+									</div>
+			
+									<div class="col-sm-6 col-md-3">
+										<div class="panel panel-body bg-info-400 has-bg-image">
+											<div class="media no-margin">			
+												<div class="media-body">
+													<h3 class="no-margin">652,549</h3>
+													<span class="text-uppercase text-size-mini">Não visualizados</span>
+												</div>
+												
+												<div class="media-right media-middle">
+													<i class="icon-file-empty2 icon-3x opacity-75"></i>
+												</div>
+												
+											</div>
+										</div>
+									</div>
+			
+									<div class="col-sm-6 col-md-3">
+										<div class="panel panel-body bg-indigo-400 has-bg-image">
+											<div class="media no-margin">
+			
+												<div class="media-body">
+													<h3 class="no-margin">245,382</h3>
+													<span class="text-uppercase text-size-mini">Faturas pagas</span>
+												</div>
+												
+												<div class="media-right media-middle">
+													<i class="icon-price-tag icon-3x opacity-75"></i>
+												</div>
+												
+											</div>
+										</div>
+									</div>
+								</div>
+								
+							</div>
+							
+							<?php
+							}
+							?>
+							
 						</div>
 						<!-- /principal -->
-						<?php
-						verMatriz($_SESSION);
-						?>
-						<div class="row">
-							<div class="col-lg-3">
-
-								<!-- Members online -->
-								<div class="panel bg-teal-400">
-									<div class="panel-body">
-										<div class="heading-elements">
-											<span class="heading-text badge bg-teal-800">+53,6%</span>
-										</div>
-
-										<h3 class="no-margin">3,450</h3>
-										Members online
-										<div class="text-muted text-size-small">489 avg</div>
-									</div>
-
-								</div>
-								<!-- /members online -->
-
-							</div>
-
-							<div class="col-lg-3">
-
-								<!-- Current server load -->
-								<div class="panel bg-pink-400">
-									<div class="panel-body">
-										<div class="heading-elements">
-											<!--
-											<ul class="icons-list">
-						                		<li class="dropdown">
-						                			<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-cog3"></i> <span class="caret"></span></a>
-													<ul class="dropdown-menu dropdown-menu-right">
-														<li><a href="#"><i class="icon-sync"></i> Update data</a></li>
-														<li><a href="#"><i class="icon-list-unordered"></i> Detailed log</a></li>
-														<li><a href="#"><i class="icon-pie5"></i> Statistics</a></li>
-														<li><a href="#"><i class="icon-cross3"></i> Clear list</a></li>
-													</ul>
-						                		</li>
-						                	</ul>
-						                	-->
-										</div>
-
-										<h3 class="no-margin">49.4%</h3>
-										Current server load
-										<div class="text-muted text-size-small">34.6% avg</div>
-									</div>
-
-									
-								</div>
-								<!-- /current server load -->
-
-							</div>
-
-							<div class="col-lg-3">
-
-								<!-- Today's revenue -->
-								<div class="panel bg-blue-400">
-									<div class="panel-body">
-										<div class="heading-elements">
-											<!--
-											<ul class="icons-list">
-						                		<li><a data-action="reload"></a></li>
-						                	</ul>
-						                	-->
-					                	</div>
-
-										<h3 class="no-margin">$18,390</h3>
-										Today's revenue
-										<div class="text-muted text-size-small">$37,578 avg</div>
-									</div>
-
-									<div id="today-revenue"></div>
-								</div>
-								<!-- /today's revenue -->
-
-							</div>
-							
-							<div class="col-lg-3">
-
-								<!-- Today's revenue -->
-								<div class="panel bg-blue-400">
-									<div class="panel-body">
-										<div class="heading-elements">
-											<!--
-											<ul class="icons-list">
-						                		<li><a data-action="reload"></a></li>
-						                	</ul>
-						                	-->
-					                	</div>
-
-										<h3 class="no-margin">$18,390</h3>
-										Today's revenue
-										<div class="text-muted text-size-small">$37,578 avg</div>
-									</div>
-
-									<div id="today-revenue"></div>
-								</div>
-								<!-- /today's revenue -->
-
-							</div>
-							
-						</div>
+						
+								
 						
 					</div>
 

@@ -159,10 +159,15 @@ function mover_arquivo($arquivo, $dir, $nome){
 	}
 }
 
-function somar_datas($numero, $tipo){
+function somar_data($qtd, $tipo, $dt='' ){
+	
+	if (empty($dt)) {
+		$dt = date('Y-m-d');
+	}
+	
 	switch ($tipo) {
     	case 'd':
-    		$tipo = ' day';
+    		$tipo = ' days';
     		break;
     	case 'm':
     		$tipo = ' month';
@@ -171,7 +176,8 @@ function somar_datas($numero, $tipo){
     		$tipo = ' year';
     		break;
     	}	
-    return "+".$numero.$tipo;
+	$data = date('Y-m-d', strtotime("+".$qtd.$tipo,strtotime($dt)));	
+    return $data;
 }
 
 function valida_logado(){
@@ -202,6 +208,12 @@ function mascara($val='', $mask=''){
  return $maskared;
 }
 
+function formata_cpf($num){
+	$cpf = preencheZero($num, 11);
+	$cpf = mascara($cpf, '###.###.###-##');
+	return $cpf;
+}
+
 function formato_moeda($valor){
 	return number_format((isset($valor)?$valor:0.00),'2',',','.');
 }
@@ -215,47 +227,76 @@ function By2M($size){
     return $size ? round($size/pow(1024, ($i = floor(log($size, 1024)))), 2) . $filesizename[$i] : '0 Bytes';
 }
 
-function IntegrarCliente($acao, $values = array()){
-	$link = "http://ws.dipsystem.com.br/api/v2.0/cliente/".$acao;
+function valida_cpf($cpf) {
+	// verifica se e numerico
 	
-	$ch = curl_init($link);
-	
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-	curl_setopt($ch, CURLOPT_POSTFIELDS, $values);
-	
-	$response = curl_exec($ch);
-	
-	curl_close($ch);
-	
-	return json_decode($response, TRUE);
-	
-}
+	if(!is_numeric($cpf)) {
+		return false;
+	}
 
-function integracaoClienteEdit($value = array()){
-	//documentação integração Editando_cliente.pdf	
-	return IntegrarCliente('editar', $value);	
-}
+	// verifica se esta usando a repeticao de um numero
+	if(($cpf == '11111111111') || 
+	   ($cpf == '22222222222') || 
+	   ($cpf == '33333333333') || 
+	   ($cpf == '44444444444') || 
+	   ($cpf == '55555555555') || 
+	   ($cpf == '66666666666') || 
+	   ($cpf == '77777777777') || 
+	   ($cpf == '88888888888') || 
+	   ($cpf == '99999999999') || 
+	   ($cpf == '00000000000')) {
+			
+		return false;
+	}
 
-function integracaoClienteInserir($value = array()){
-	//documentação integração Inserir_cliente.pdf	
-	return IntegrarCliente('inserir', $value);	
-}
+	//PEGA O DIGITO VERIFIACADOR
+	$dv_informado = substr($cpf, 9,2);
 
-function integracaoClienteExcluir($value = array()){
-	//documentação integração Excluir_cliente.pdf	
-	return IntegrarCliente('excluir', $value);	
-}
+	for($i=0; $i<=8; $i++) {
+		$digito[$i] = substr($cpf, $i,1);
+	}
 
-function IntegracaoTeste($values = array()){
-	$link = "http://ws.dipsystem.com.br/api/v2.0/misc/testar";
-	$ch = curl_init($link);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-	curl_setopt($ch, CURLOPT_POSTFIELDS, $values);
-	$response = curl_exec($ch);
-	curl_close($ch);
-	return json_decode($response, TRUE);
-}
+	//CALCULA O VALOR DO 10º DIGITO DE VERIFICAÇÂO
+	$posicao = 10;
+	$soma = 0;
+
+	for($i=0; $i<=8; $i++) {
+		$soma = $soma + $digito[$i] * $posicao;
+		$posicao = $posicao - 1;
+	}
+
+	$digito[9] = $soma % 11;
+
+	if($digito[9] < 2) {
+		$digito[9] = 0;
+	} else {
+		$digito[9] = 11 - $digito[9];
+	}
+
+	//CALCULA O VALOR DO 11º DIGITO DE VERIFICAÇÃO
+	$posicao = 11;
+	$soma = 0;
+
+	for ($i=0; $i<=9; $i++) {
+		$soma = $soma + $digito[$i] * $posicao;
+		$posicao = $posicao - 1;
+	}
+
+	$digito[10] = $soma % 11;
+
+	if ($digito[10] < 2) {
+		$digito[10] = 0;
+	}else {
+	$digito[10] = 11 - $digito[10];
+	}
+
+	//VERIFICA SE O DV CALCULADO É IGUAL AO INFORMADO
+	$dv = $digito[9] * 10 + $digito[10];
+	if ($dv != $dv_informado) {
+		return false;
+	}
+
+	return true;
+} // function valida_cpf($cpf)
 
 ?>
