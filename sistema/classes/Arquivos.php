@@ -14,6 +14,8 @@ Class Arquivos extends Connection{
 	private $observacao;
 	private $chave;
 	private $enviado;
+	private $id_funcionarios;
+	private $id_categorias; 
 		
 	public function getId(){
 		return $this->id;
@@ -106,6 +108,20 @@ Class Arquivos extends Connection{
 		$this->enviado = $value;
 	}
 	
+	public function getIdFuncionarios(){
+		return $this->id_funcionarios;
+	}
+	public function setIdFuncionarios($value){
+		$this->id_funcionarios = $value;
+	}
+	
+	public function getIdCategorias(){
+		return $this->id_categorias;
+	}
+	public function setIdCategorias($value){
+		$this->id_categorias = $value;
+	}
+	
 	public function setValues($values = array()){
 		
 		if(isset($values['id'])) 						$this->setId($values['id']);
@@ -121,6 +137,8 @@ Class Arquivos extends Connection{
 		if(isset($values['observacao'])) 				$this->setObservacao($values['observacao']);	
 		if(isset($values['chave']))		 				$this->setChave($values['chave']);
 		if(isset($values['enviado']))	 				$this->setEnviado($values['enviado']);
+		if(isset($values['id_funcionarios']))			$this->setIdFuncionarios($values['id_funcionarios']);
+		if(isset($values['id_categorias']))				$this->setIdCategorias($values['id_categorias']);
 		
 	}
 	
@@ -139,20 +157,22 @@ Class Arquivos extends Connection{
 		if(!empty($this->getObservacao()))				$values['observacao']	 			= $this->getObservacao();
 		if(!empty($this->getChave))						$values['chave']		 			= $this->getChave();
 		if(!empty($this->getEnviado()))					$values['enviado']		 			= $this->getEnviado();
+		if(!empty($this->getIdFuncionarios()))			$values['id_funcionarios'] 			= $this->getIdFuncionarios();
+		if(!empty($this->getIdCategorias()))			$values['id_categorias'] 			= $this->getIdCategorias();
 		
 		return $values;
 		
 	}
 	
-	public function insertBlob($nome, $tipo, $tamanho, $extensao, $descricao, $arquivo, $periodo, $id_clientes, $observacao, $chave, $enviado) {
+	public function insertBlob($nome, $tipo, $tamanho, $extensao, $descricao, $arquivo, $periodo, $id_clientes, $observacao, $chave, $enviado, $id_funcionarios, $id_categorias) {
 		$conn = new Connection();
-		$arq = $conn->insertBlob($nome, $tipo, $tamanho, $extensao, $descricao, $arquivo, $periodo, $id_clientes, $observacao, $chave, $enviado);
+		$arq = $conn->insertBlob($nome, $tipo, $tamanho, $extensao, $descricao, $arquivo, $periodo, $id_clientes, $observacao, $chave, $enviado, $id_funcionarios, $id_categorias);
         return $arq;
     }
 	
-	public function updateBlob($id, $nome, $tipo, $tamanho, $extensao, $descricao, $arquivo, $periodo, $id_clientes, $observacao, $chave, $enviado) {
+	public function updateBlob($id, $nome, $tipo, $tamanho, $extensao, $descricao, $arquivo, $periodo, $id_clientes, $observacao, $chave, $enviado, $id_funcionarios, $id_categorias) {
 		$conn = new Connection();
-		$arq = $conn->updateBlob($id, $nome, $tipo, $tamanho, $extensao, $descricao, $arquivo, $periodo, $id_clientes, $observacao, $chave, $enviado);
+		$arq = $conn->updateBlob($id, $nome, $tipo, $tamanho, $extensao, $descricao, $arquivo, $periodo, $id_clientes, $observacao, $chave, $enviado, $id_funcionarios, $id_categorias);
         return $arq;
     }
 	
@@ -182,10 +202,47 @@ Class Arquivos extends Connection{
 								        a.periodo,
 								        a.observacao,
 								        a.chave,
-								        a.enviado
+								        a.enviado,
+								        a.id_funcionarios, 
+								        a.id_categorias
 								   FROM tb_arquivos a 
-								  WHERE a.id_clientes = :ID_CLIENTES;",array(
-			":ID_CLIENTES" => $id_clientes
+								  WHERE a.id_clientes = :ID_CLIENTES AND a.id_funcionarios = :ID_FUNCIONARIOS;",array(
+			":ID_CLIENTES" => $id_clientes,
+			":ID_FUNCIONARIOS"=>0
+		));
+		
+		if (isset($result[0])) {
+			$retorno = $result;
+		}else {
+			$retorno = FALSE;
+		}
+		
+		return $retorno;
+	}
+	
+	public function loadArquivosFuncionarios($id_funcionarios){
+		$retorno = '';	
+		$conn = new Connection();
+		$result = $conn->select("SELECT a.id,
+									    a.nome,
+								        a.tipo,
+								        a.tamanho,
+								        a.extensao,
+								        a.descricao,								        
+								        date_format(a.dt_cadastro,'%d/%m/%Y') as dt_cadastro,
+								        if(a.arquivo is not null, 1, 0) as fg_arquivo,
+								        a.periodo,
+								        a.observacao,
+								        a.chave,
+								        a.enviado,
+								        a.id_funcionarios, 
+								        a.id_categorias,
+								       	c.descricao as desc_categorias
+								       	
+								   FROM tb_arquivos a
+								   LEFT JOIN tb_arquivos_categorias c on c.id = a.id_categorias 
+								  WHERE a.id_funcionarios = :ID_FUNCIONARIOS",array(
+			":ID_FUNCIONARIOS"=>$id_funcionarios
 		));
 		
 		if (isset($result[0])) {

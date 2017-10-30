@@ -23,6 +23,11 @@ $app->get('/funcionarios-lista/:id_clientes', function($id_clientes='') use ($ap
 								</a>			
 								<ul class="dropdown-menu dropdown-menu-right">
 									<li>
+										<a href="#" id="'.$value['id'].'" rel="funcionarios-arquivos">
+											<i class="icon-file-upload"></i> Add Arquivos
+										</a>
+									</li>
+									<li>
 										<a href="#" id="'.$value['id'].'" rel="edit-funcionarios">
 											<i class="glyphicon glyphicon-pencil"></i> Editar
 										</a>
@@ -105,7 +110,7 @@ $app->post('/funcionarios-add', function() use ($app){
 	if(isset($_POST)){
 		//$_POST['senha'] = md5($_POST['senha']);
 		$add = $class->add($_POST);		
-		if ($add) {			
+		if ($add) {
 			die(json_encode(array('success'=>TRUE, 'type'=>'success', 'msg'=>'Cadastro efetuado com sucesso.', 'id'=>$add)));
 		} else {
 			die(json_encode(array('error'=>TRUE, 'type'=>'danger', 'msg'=>'Erro ao fazer o cadastro tente novamente.')));
@@ -169,7 +174,101 @@ $app->get('/funcionarios-del/:id', function($id) use ($app){
 	}
 });
 
+$app->post('/funcionarios-arquivos-add', function() use ($app){
+	valida_logado();
+	$class = new Funcionarios();
+	
+	if(isset($_POST) && isset($_FILES['arquivo']) && $_FILES['arquivo']['size']>0){
+		
+		$arr['nome'] 				= $_FILES['arquivo']['name'];
+		$arr['tipo'] 				= $_FILES['arquivo']['type'];
+		$arr['tamanho'] 			= $_FILES['arquivo']['size'];
+		$arr['extensao'] 			= mb_strtolower(end(explode('.', $_FILES['arquivo']['name'])));
+		$arr['descricao'] 			= $_POST['descricao'];
+		$arr['arquivo'] 			= $_FILES['arquivo']['tmp_name'];
+		$arr['periodo'] 			= (!empty($_POST['periodo'])?$_POST['periodo']:0);
+		$arr['id_clientes'] 		= $_POST['id_clientes'];
+		$arr['observacao'] 			= (!empty($_POST['observacao'])?$_POST['observacao']:'');
+		$arr['chave'] 				= md5(date('dmYHis').$_POST['id_clientes']);
+		$arr['enviado'] 			= $_SESSION['usuario']['perfil'];
+		$arr['id_funcionarios'] 	= $_POST['id_funcionarios'];
+		$arr['id_categorias']		= $_POST['id_categorias'];
+		
+		if (!in_array($arr['extensao'], extensoes_permitidos())) {
+			die(json_encode(array('error'=>TRUE, 'type'=>'warning', 'msg'=>'Extensões permitidas ('.implode(', ', extensoes_permitidos()).')')));
+		}
+				
+		$arquivo = new Arquivos();
+		
+		$add = $arquivo->insertBlob($arr['nome'], 
+									$arr['tipo'], 
+									$arr['tamanho'], 
+									$arr['extensao'], 
+									$arr['descricao'], 
+									$arr['arquivo'], 
+									$arr['periodo'], 
+									$arr['id_clientes'], 
+									$arr['observacao'], 
+									$arr['chave'], 
+									$arr['enviado'],
+									$arr['id_funcionarios'],
+									$arr['id_categorias']);
+		if ($add) {
+			die(json_encode(array('success'=>TRUE, 'type'=>'success', 'msg'=>'Arquivo salvo com sucesso.', 'id'=>$add)));		
+		} else {
+			die(json_encode(array('error'=>TRUE, 'type'=>'danger', 'msg'=>'Erro ao salvar o arquivo, tente novamente.')));
+		}
+	}
+	
+});
 
+$app->get('/funcionarios-arquivos-lista1/:id_funcionarios', function($id_funcionarios) use ($app){
+	valida_logado();
+	$arquivo 	= new Arquivos();
+	$lista1 	= $arquivo->loadArquivosFuncionarios($id_funcionarios);
+	
+	$result = array();
+	if($lista1){
+		$desc_categoria = '';
+		foreach ($lista1 as $key => $value) {
+				
+			$tipo = '';
+			if ($value['tipo']=='image/png' || $value['tipo']=='image/jpeg') {
+				$tipo = 'icon-image2';			
+			} else if ($value['tipo']=='application/pdf') {
+				$tipo = 'icon-file-pdf';
+			} else if ($value['tipo']=='application/zip' || $value['tipo']=='application/rar') {
+				$tipo = 'icon-file-zip';
+			} else if ($value['tipo']=='application/word') {
+				$tipo = 'icon-file-word';
+			} else if ($value['tipo']=='text/plain') {
+				$tipo = 'icon-file-xml';
+			} else{
+				$tipo = 'icon-file-empty';
+			}
+			
+			$acoes = '<a href="'.site_url().'/arquivos-dowload/'.md5($value['id']).'" target="_blank" rel="download-arquivo" title="Download do arquivo">
+						<i class="icon-file-download text-center"></i>
+					  </a>';
+			
+			$desc_categoria = (!empty($value['desc_categoria'])?$value['desc_categoria']:'-');
+			//'<i class="'.$tipo.'" title="'.$value['nome'].'"></i>',
+			
+			$result['data'][] = array($value['id'],
+									  $value['dt_cadastro'],
+									  '<a href="#" title="'.$value['observacao'].'">'.$value['descricao'].'</a>',
+									  '<i class="'.$tipo.'" title="'.$value['nome'].'"></i>',
+									  '<span class="label label-default">'.By2M($value['tamanho']).'</span>',
+							  		  $acoes);
+			
+											  
+		}
+	}else{
+		$result['data'][] = array('','','Nenhum arquivo cadastrado','','','');
+	}		
+		
+	die(html_entity_decode(json_encode($result, JSON_UNESCAPED_UNICODE)));
+});
 
 $app->get('/dowload-arquivo/:id', function($id) use ($app){
 	valida_logado();	

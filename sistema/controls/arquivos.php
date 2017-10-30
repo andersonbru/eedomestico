@@ -87,7 +87,7 @@ $app->get('/arquivos-lista/:id_clientes', function($id_clientes) use ($app){
 								</a>			
 								<ul class="dropdown-menu dropdown-menu-right">
 									<li>
-										<a href="/dowload-arquivo/'.md5($value['id']).'" target="_blank" rel="download-arquivo" title="Download do arquivo">
+										<a href="'.site_url().'/arquivos-dowload/'.md5($value['id']).'" target="_blank" rel="download-arquivo" title="Download do arquivo">
 											<i class="glyphicon glyphicon-cloud-download"></i> Download
 										</a>
 									</li>

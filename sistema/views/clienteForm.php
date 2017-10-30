@@ -264,7 +264,7 @@ $template = new Template();
 	
 <!-- Modal -->
 <div class="modal fade" id="modal-funcionario" tabindex="-1" role="dialog" aria-labelledby="modalFuncionarioLabel">
-	<div class="modal-dialog" role="document">
+	<div class="modal-dialog modal-full" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -273,19 +273,45 @@ $template = new Template();
 				<h4 class="modal-title" id="modalExcluirLabel">Controle de Funcionários</h4>
 			</div>
 			<div class="modal-body">
-			<?php
-			$template->iniciarForm('#','post','','name=form-funcionarios');
-				$template->gerarInputHidden('id_clientes', $data['id']);
-				$template->gerarInputHidden('id', '');
-				$template->gerarInputText('Nome', 'nome', '', 'Nome Completo', TRUE, '', '', 2, 2, 10, 10);
-				$template->gerarInputText('RG', 'rg', '', 'RG', TRUE, '', '', 2, 2, 5, 5);
-				$template->gerarInputText('CPF', 'cpf', '', 'XXX.XXX.XXX-XX', TRUE, 'mask-cpf', '', 2, 2, 6, 6);
-				$template->gerarInputText('Título de Eleitor', 'titulo_eleitor', '', '', TRUE, '', '', 2, 2, 6, 6);
-				$template->gerarInputText('Data de Nascimento', 'dt_nascimento', '', 'DD/MM/YYYY', TRUE, 'mask-data', '', 2, 2, 4, 4);
-				$template->gerarSelect('Status', 'ativo', array('S'=>'Ativo', 'N'=>'Inativo'), '', '', TRUE, 2, 2, 4, 4);
+				<?php
+				$template->iniciarForm('#','post','','name=form-funcionarios');
+				?>
+				<div class="row">
+					<div class="col-xs-12 col-sm-12 col-md-5 col-lg-5">
+					<?php
+					$template->gerarInputHidden('id_clientes', $data['id']);
+					$template->gerarInputHidden('id', '');
+					$template->gerarInputText('Nome', 'nome', '', 'Nome Completo', TRUE, '', '', 2, 2, 10, 10);
+					$template->gerarInputText('RG', 'rg', '', 'RG', TRUE, '', '', 2, 2, 5, 5);
+					$template->gerarInputText('CPF', 'cpf', '', 'XXX.XXX.XXX-XX', TRUE, 'mask-cpf', '', 2, 2, 6, 6);
+					$template->gerarInputText('Título de Eleitor', 'titulo_eleitor', '', '', TRUE, '', '', 2, 2, 6, 6);
+					$template->gerarInputText('Data de Nascimento', 'dt_nascimento', '', 'DD/MM/YYYY', TRUE, 'mask-data', '', 2, 2, 4, 4);
+					$template->gerarSelect('Status', 'ativo', array('S'=>'Ativo', 'N'=>'Inativo'), '', '', TRUE, 2, 2, 4, 4);
+					?>	
+					</div>
+					<div class="col-xs-12 col-sm-12 col-md-7 col-lg-7" style="border-left: 1px solid grey">
+						<h5 class="" id="">Arquivos</h5>
+						<table class="table table-responsive table-funcionarios-arquivos">
+							<thead>
+								<tr>
+									<th>Código</th>
+									<th>Cadastro</th>
+									<th>Descrição</th>
+									<th>Tipo</th>
+									<th>Tamanho</th>
+									<th class="text-center">Ações</th>
+								</tr>
+							</thead>
+							<tbody>
+								
+							</tbody>
+						</table>
+					</div>
+				</div>
 				
-			$template->finalizarForm();
-			?>
+				<?php
+				$template->finalizarForm();
+				?>	
 			</div>
 			<div class="modal-footer">
 				<button type="button" rel="cancel_exclusao" class="btn btn-default" data-dismiss="modal">
@@ -332,6 +358,49 @@ $template = new Template();
 		</div>
 	</div>
 </div>
+
+<div class="modal fade" id="modal-funcionarios-arquivos" tabindex="-1" role="dialog" aria-labelledby="modalFuncionariosArquivosLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="modalFuncionariosArquivosLabel">Controle de Arquivos</h4>
+			</div>
+			<div class="modal-body">
+			<?php
+			$template->iniciarForm('#','post','','name=form-funcionarios-arquivos');
+				$template->gerarInputHidden('id_clientes', $data['id']);
+				$template->gerarInputHidden('id_funcionarios', '');
+				$template->gerarInputText('Descrição', 'descricao', '', 'Descrição', TRUE, '', '', 2, 2, 10, 10);
+				$template->gerarInputText('Arquivo', 'arquivo', '', 'Arquivos', TRUE, '', '', 2, 2, 10, 10, 'file');				
+				$template->gerarTextArea('Observação', 'observacao', '', '');
+				
+				$arquivosCategorias 		= new ArquivosCategorias();
+				$arr_arquivos_categorias 	= $arquivosCategorias->load();
+				$arr_values 				= array();
+				if ($arr_arquivos_categorias) {
+					foreach ($arr_arquivos_categorias as $key => $value) {
+						$arr_values[$value['id']] = $value['descricao'];
+					}
+				}
+				$template->gerarSelect('Tipo', 'id_categorias', $arr_values, '', '', TRUE, 2, 2, 6, 6);
+				
+			$template->finalizarForm();
+			?>
+			</div>
+			<div class="modal-footer">
+				<button type="button" rel="cancel_exclusao" class="btn btn-default" data-dismiss="modal">
+					Cancelar
+				</button>
+				<button type="button" rel="add-funcionarios-arquivos" class="btn btn-primary">
+					Salvar
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
 	
 <script>
 
@@ -356,6 +425,19 @@ function tabela_arquivos(cliente){
     });    
 }
 
+function tabela_funcionarios_arquivos(funcionario){
+	$('table-funcionarios-arquivos tbody').html('');
+	$('.table-funcionarios-arquivos').dataTable({		
+		ajax: '<?=site_url()?>/funcionarios-arquivos-lista1/'+funcionario,
+		"language": {
+						"url": "https://cdn.datatables.net/plug-ins/1.10.13/i18n/Portuguese-Brasil.json"
+				},
+		"destroy": true,
+		"processing": true,
+		"lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]]
+    });    
+}
+
 function carregaTabela(){
 	//recarregar qual tabela
 	
@@ -373,7 +455,7 @@ function inserirCarregando(elemento){
 	$(elemento).html(carregando);
 }
 
-function submitForm(formName){
+function submitForm(formName, consoleLog=false){
 	var resetForm = true;
 	
 	$('.msg-form-'+formName+'').remove();
@@ -385,7 +467,7 @@ function submitForm(formName){
 	$('form[name=form-'+formName+']').ajaxForm({
 			
 		success : function(data) {
-			console.log(data);
+			if(consoleLog) console.log(data);
 		    if(data.success){
 		    	if(data.id){
 		    		$('form[name=form-'+formName+']').attr('action','<?=site_url()?>/'+formName+'-edit');
@@ -444,6 +526,9 @@ $(document).ready(function(){
 				$('form[name=form-funcionarios] input[name=titulo_eleitor]').val(data.titulo_eleitor);
 				$('form[name=form-funcionarios] input[name=dt_nascimento]').val(data.dt_nascimento);
 				$('form[name=form-funcionarios] select[name=ativo]').val(data.ativo);
+				
+				tabela_funcionarios_arquivos($(this).attr('id'));
+				
 			}
 		});
 		
@@ -469,6 +554,22 @@ $(document).ready(function(){
 		e.preventDefault();
 		submitForm('funcionarios');
 	});
+	
+	$(document).on('click','a[rel=funcionarios-arquivos]', function(e){
+		e.preventDefault();
+		limpaForm('form-funcionarios-arquivos');
+		$('form[name=form-funcionarios-arquivos] input[name=id_clientes]').val(<?=$data['id']?>);
+		$('form[name=form-funcionarios-arquivos] input[name=id_funcionarios]').val($(this).attr('id'));
+		$('#modal-funcionarios-arquivos').modal('show');
+		$('form[name=form-funcionarios-arquivos]').attr('action','<?=site_url()?>/funcionarios-arquivos-add');
+	});
+	
+	//funcionarios-arquivos
+	$('button[rel=add-funcionarios-arquivos]').on('click', function(e){
+		e.preventDefault();
+		submitForm('funcionarios-arquivos', true);
+	});
+	
 	
 	//Ações arquivos
 	$('a[rel=nv-arquivos]').on('click',function(e){
